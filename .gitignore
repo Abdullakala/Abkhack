@@ -1,0 +1,27 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.log
+npm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Workspace mounted into the sandbox
+workspace/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
