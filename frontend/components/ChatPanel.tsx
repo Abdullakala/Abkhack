@@ -55,7 +55,16 @@ export function ChatPanel({ onWorkspaceChanged }: Props) {
       return;
     }
 
-    if (!res.body) {
+    if (!res.ok || !res.body) {
+      const detail = await res.text().catch(() => res.statusText);
+      setMessages((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = {
+          role: "assistant",
+          content: `⚠️ خطأ من الخادم: ${res.status} ${detail}`,
+        };
+        return copy;
+      });
       setStreaming(false);
       return;
     }

@@ -1,6 +1,8 @@
 # Minimal image for executing untrusted Python / Node.js code.
-# Runs as a non-root user, is launched with --network=none and a read-only
-# root filesystem by the backend.
+# Runs as a non-root user. The backend launches this image with
+# --network=none, CPU / memory / PID caps, a read-only root filesystem and
+# a small tmpfs at /tmp. The user's workspace is bind-mounted read-write at
+# /workspace so sandboxed code can produce artifacts.
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

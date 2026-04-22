@@ -1,8 +1,20 @@
 """Sandboxed code execution via Docker.
 
-A short-lived container is spawned per run with the workspace mounted
-read-only except for an explicit scratch path. Network is disabled and
-CPU / memory are capped via config.
+A short-lived container is spawned per run with the following isolation
+properties:
+
+- **Container root filesystem is read-only** (``--read-only``), so malicious
+  code cannot modify the runtime image itself.
+- **Network is disabled** (``--network=none``), blocking any outbound
+  traffic.
+- **CPU, memory and PID limits** are enforced per config.
+- **`/tmp` is a small tmpfs** for scratch writes that vanish at exit.
+- **The user's workspace is bind-mounted read-write at `/workspace`** so that
+  executed code can create and update artifacts (e.g. build outputs, test
+  reports). This is an intentional trade-off: we trust that the user's own
+  code may modify the user's own workspace. The sandbox's job is to contain
+  OS-level escape, not to stop user code from touching user files. Clients
+  that need stricter isolation should change the mount to `:ro` below.
 """
 
 from __future__ import annotations
