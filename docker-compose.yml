@@ -1,0 +1,43 @@
+services:
+  sandbox:
+    # Image is pre-built by the backend's first run via `docker build`,
+    # but defining a service here lets `docker compose build sandbox` work.
+    build:
+      context: ./sandbox
+    image: abkhack-sandbox:latest
+    profiles: ["build-only"]
+
+  backend:
+    build:
+      context: ./backend
+    image: abkhack-backend:latest
+    environment:
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      ANTHROPIC_MODEL: "${ANTHROPIC_MODEL:-claude-sonnet-4-5-20250929}"
+      WORKSPACE_DIR: /workspace
+      SANDBOX_IMAGE: abkhack-sandbox:latest
+      CORS_ORIGINS: "http://localhost:3000"
+    volumes:
+      - ./workspace:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8000:8000"
+    depends_on:
+      - sandbox
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    image: abkhack-frontend:dev
+    environment:
+      BACKEND_URL: http://backend:8000
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
